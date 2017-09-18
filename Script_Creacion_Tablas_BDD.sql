@@ -14,15 +14,19 @@ CREATE TABLE [dbo].[Pasajeros]
 	[nombre_apellido] [VARCHAR](30) NOT NULL,
 	[fecha_nacimiento] [DATE] NOT NULL,
 	[dni] [INT] NOT NULL, 
-	[email] [VARCHAR](30) NOT NULL,
+	[email] [VARCHAR](30) NULL,
 );
+
+CREATE SEQUENCE factura_numero_seq
+    START WITH 1  
+    INCREMENT BY 1 ; 
 
 CREATE TABLE [dbo].[Facturas]
 (
 	[id] [INT] IDENTITY(1,1) NOT NULL,	
 	[fecha] [DATE] NOT NULL,
 	[tipo] [CHAR](1) NOT NULL,
-	[numero] [INT] NOT NULL, 
+	[numero] [INT] default next value for dbo.factura_numero_seq NOT NULL, 
 	[importe] [DECIMAL](10,2) NOT NULL,
 );
 
@@ -55,22 +59,24 @@ CREATE TABLE [dbo].[Paquetes]
 	[cantidad_dias] [INT] NOT NULL, 
 	[importe] [DECIMAL](10,2) NOT NULL,
 	[tiene_seguro] [BIT] NOT NULL, --VALOR 1 (TRUE) Ó 0 (FALSE)
-	[factura_id] [INT] NOT NULL,
+	[factura_id] [INT] NULL,
 	[quiere_visita_guiada] [BIT] NOT NULL, --VALOR 1 (TRUE) Ó 0 (FALSE)
 	[quiere_abono_transporte_local] [BIT] NOT NULL, --VALOR 1 (TRUE) Ó 0 (FALSE)
-	[es_paquete_con_estadia] [BIT] NOT NULL, --VALOR 1 (TRUE, PAQUETE CON ESTADIA) Ó 0 (FALSE, PAQUETE SIN ESTADIA)
+	--[es_paquete_con_estadia] [BIT] NOT NULL, --VALOR 1 (TRUE, PAQUETE CON ESTADIA) Ó 0 (FALSE, PAQUETE SIN ESTADIA)
 	[hotel_id] [INT] NULL, --ACEPTA NULL PARA PAQUETES SIN ESTADIA, CASO CONTRARIO PAQUETE CON ESTADIA
 	[es_pension_completa] [BIT] NULL, --VALOR 1 (TRUE) Ó 0 (FALSE), ACEPTA NULL PARA PAQUETES SIN ESTADIA, CASO CONTRARIO PAQUETE CON ESTADIA
 );
 
 CREATE TABLE [dbo].[LocalidadesPaquetes]
 (
+	[id] [INT] IDENTITY(1,1) NOT NULL,	
 	[paquete_id] [INT] NOT NULL, --ID PAQUETE
 	[localidad_id] [INT] NOT NULL, --ID LOCALIDAD
 );
 
 CREATE TABLE [dbo].[PasajerosPaquetes]
 (
+	[id] [INT] IDENTITY(1,1) NOT NULL,	
 	[paquete_id] [INT] NOT NULL, --ID PAQUETE
 	[pasajero_id] [INT] NOT NULL, --ID PASAJERO
 );

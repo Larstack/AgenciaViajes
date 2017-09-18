@@ -1,25 +1,29 @@
 package ar.edu.usal.tp9.model.dao;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.Iterator;
-import java.util.Scanner;
 
 import ar.edu.usal.tp9.model.dto.Hoteles;
+import ar.edu.usal.tp9.utils.DbConnection;
 
 public class HotelesDao {
 	
 	private static HotelesDao hotelesDaoInstance = null;
 
+	private Connection conn;
+	
 	private ArrayList<Hoteles> hoteles;
 
 	private HotelesDao(){
 		
 		this.hoteles = new ArrayList<Hoteles>();
 		
+		DbConnection dbConn = DbConnection.getInstance();
+		this.conn = dbConn.getConnection();
+
 		this.loadHoteles();
 	}
 
@@ -35,44 +39,27 @@ public class HotelesDao {
 	
 	private void loadHoteles() {
 		
-		File hotelesTxt = new File("./archivos/HOTELES.txt");
-		Scanner hotelesScanner;
-		
 		try {
 			
-			try {
-				hotelesTxt.createNewFile();
+			String sql = "SELECT id, nombre, importe, estrellas FROM Hoteles";
+			Statement stmt = this.conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
 			
-			} catch (IOException e) {
-
-				System.out.println("Se ha verificado un error al cargar el archivo de hoteles.");
-			}
-			
-			hotelesScanner = new Scanner(hotelesTxt);
-			
-			while(hotelesScanner.hasNextLine()){
+			while(rs.next()){
 				
 				Hoteles hotel = new Hoteles();
 				
-				String linea = hotelesScanner.nextLine();
-				String[] lineaArray = linea.split(";");
-
-				hotel.setNombre(lineaArray[0].trim());
-				hotel.setEstrellas(Integer.valueOf(lineaArray[1].trim()));				
-				hotel.setImporte(Double.valueOf(lineaArray[2].trim()));
+				hotel.setId(rs.getInt("id"));
+				hotel.setNombre(rs.getString("nombre"));
+				hotel.setEstrellas(rs.getInt("estrellas"));				
+				hotel.setImporte(rs.getDouble("importe"));
 				
 				this.hoteles.add(hotel);
 			}
 			
-			hotelesScanner.close();
+		}catch(Exception e){
 			
-		}catch(InputMismatchException e){
-			
-			System.out.println("Se ha encontrado un tipo de dato insesperado.");
-			
-		}catch (FileNotFoundException e) {
-			
-			System.out.println("No se ha encontrado el archivo.");
+			System.out.println("Error al cargar los hoteles.");
 		}
 	}
 	
@@ -85,6 +72,23 @@ public class HotelesDao {
 			Hoteles hotel = (Hoteles) hotelesIterator.next();
 			
 			if(hotel.getNombre().trim().equals(hotelString.trim())){
+				
+				return hotel;
+			}
+		}
+		
+		return null;
+	}
+	
+	public Hoteles getHotelById(int idHotel) {
+
+		Iterator hotelesIterator = this.hoteles.iterator();
+		
+		while (hotelesIterator.hasNext()) {
+			
+			Hoteles hotel = (Hoteles) hotelesIterator.next();
+			
+			if(hotel.getId() == idHotel){
 				
 				return hotel;
 			}

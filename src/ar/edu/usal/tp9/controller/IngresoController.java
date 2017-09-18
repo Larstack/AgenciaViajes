@@ -158,8 +158,6 @@ public class IngresoController implements ActionListener, ICalculoImporte {
 			
 			paquete = new Paquetes();
 		}
-
-		paquete.setId(PaquetesDao.getNextIdPaquetes());
 		
 		paquete.setCantidadDias(Integer.valueOf(this.ingresoView.getTxtCantidadDias().getText()));
 		
@@ -177,16 +175,12 @@ public class IngresoController implements ActionListener, ICalculoImporte {
 		ArrayList<String> localidades = new ArrayList<String>(); 
 		ListModel model = this.ingresoView.getListaLocalidadesCopia().getModel();
 		for (int i = 0; i < model.getSize(); i++) {
-			
+
 			localidades.add((String) model.getElementAt(i));
 		}
 		
 		paquete.setLocalidades(localidades);
-		
-//		PasajerosDao pasajerosDao = PasajerosDao.getInstance();
-//		Pasajeros pasajero = pasajerosDao.getPasajeroByNombre((String)(this.ingresoView.getCmbPasajeros().getSelectedItem()));
-//		paquete.setPasajero(pasajero);
-		
+				
 		ArrayList<Pasajeros> pasajeros = new ArrayList<Pasajeros>(); 
 		ListModel modelPasajeros = this.ingresoView.getListaPasajerosCopia().getModel();
 		for (int i = 0; i < modelPasajeros.getSize(); i++) {
@@ -202,16 +196,14 @@ public class IngresoController implements ActionListener, ICalculoImporte {
 				equals("Si") ? true : false);
 		
 		//Se genera la factura correspondiente.
-		FacturasDao facturasDao = FacturasDao.getInstance();
 		paquete.generarFactura();
 		
-		PaquetesDao paquetesDao = PaquetesDao.getInstance();
-		paquetesDao.getPaquetes().add(paquete);
+		PaquetesDao paquetesDao = new PaquetesDao();
 		
-		return paquetesDao.persistirPaquetes();
+		return paquetesDao.persistirPaqueteSP(paquete);
 	}
 
-	public Object[] getLocalidadesFromTxt() {
+	public Object[] getLocalidadesFromDb() {
 		
 		TablasMaestrasDao tablasMaestrasDao = TablasMaestrasDao.getInstance();
 		
@@ -235,7 +227,7 @@ public class IngresoController implements ActionListener, ICalculoImporte {
 		return nombresPasajeros.toArray();
 	}
 
-	public Object[] getHotelesFromTxt() {
+	public Object[] getHotelesFromDb() {
 		
 		HotelesDao hotelesDao = HotelesDao.getInstance();
 		Iterator it = hotelesDao.getHoteles().iterator();

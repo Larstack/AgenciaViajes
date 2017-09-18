@@ -22,7 +22,6 @@ public class ConsultaMasivaController implements ActionListener {
 	public void setView(ConsultaMasivaView consultaMasivaView) {
 
 		this.consultaMasivaView = consultaMasivaView;
-
 	}
 
 	@Override

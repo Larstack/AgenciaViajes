@@ -1,140 +1,104 @@
 package ar.edu.usal.tp9.model.dao;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Calendar;
-import java.util.InputMismatchException;
-import java.util.Scanner;
 
-import ar.edu.usal.tp9.model.dto.Facturas;
 import ar.edu.usal.tp9.model.dto.Paquetes;
-import ar.edu.usal.tp9.model.dto.Pasajeros;
-import ar.edu.usal.tp9.utils.Validador;
+import ar.edu.usal.tp9.utils.DbConnection;
 
 public class FacturasDao {
 
-	private static int nextIdFactura = 0;
+//	private static int nextIdFactura = 0;
 
-	private static FacturasDao facturasDaoInstance = null;
+//	private static FacturasDao facturasDaoInstance = null;
+
+	private Connection conn;
+
+	public FacturasDao(){
+
+		DbConnection dbConn = DbConnection.getInstance();
+		this.conn = dbConn.getConnection();
 		
-	private FacturasDao(){
-				 
-		this.loadFacturas();
-		loadNextId();
+//		this.loadFacturas();
 	}
 
-	public static FacturasDao getInstance(){
-		
-		if(facturasDaoInstance==null){
-			
-			facturasDaoInstance = new FacturasDao();
-		}
-		
-		return facturasDaoInstance;
-	}
+//	public static FacturasDao getInstance(){
+//		
+//		if(facturasDaoInstance==null){
+//			
+//			facturasDaoInstance = new FacturasDao();
+//		}
+//		
+//		return facturasDaoInstance;
+//	}
 	
-	private void loadFacturas() {
-		
-		File facturasTxt = new File("./archivos/FACTURAS.txt");
-		Scanner facturasScanner;
-		
-		try {
-			
-			try {
-				facturasTxt.createNewFile();
-			
-			} catch (IOException e) {
-
-				System.out.println("Se ha verificado un error al cargar el archivo de facturas.");
-			}
-			
-			facturasScanner = new Scanner(facturasTxt);
-			
-			while(facturasScanner.hasNextLine()){
-				
-				String linea = facturasScanner.nextLine();
-				String[] lineaArray = linea.split(";");
-
-				int numeroFactura = Integer.valueOf(lineaArray[0].trim());
-				int idPaquete = Integer.valueOf(lineaArray[1].trim());
-				Calendar fecha = Validador.stringToCalendar(lineaArray[2], "dd/MM/yyyy");
-				
-				PasajerosDao pasajerosDao = PasajerosDao.getInstance();
-				Pasajeros pasajero = pasajerosDao.getPasajeroByNombre(lineaArray[3].trim());
-				char tipo = lineaArray[4].trim().charAt(0);
-				double importe = Double.valueOf(lineaArray[5].trim());
-				
-				PaquetesDao paquetesDao = PaquetesDao.getInstance();
-				
-				Paquetes paquete = paquetesDao.getPaqueteById(idPaquete);
-				paquete.generarFactura(numeroFactura, idPaquete, fecha, tipo, importe);
-				
-			}
-			
-			facturasScanner.close();
-			
-		}catch(InputMismatchException e){
-			
-			System.out.println("Se ha encontrado un tipo de dato insesperado.");
-			
-		}catch (FileNotFoundException e) {
-			
-			System.out.println("No se ha encontrado el archivo.");
-		}
-	}
+//	public void loadFacturas() {
+//
+//		try{
+//			String sql = 
+//					"select f.fecha fecha, f.importe importe, f.numero numero, f.tipo tipo, paq.id paqueteid" +
+//					"from Facturas f " +
+//					"	inner join Paquetes paq on f.id = paq.factura_id ";
+////					"		inner join PasajerosPaquetes pp on paq.id = pp.paquete_id ";
+//
+//			Statement stmt = this.conn.createStatement();
+//			ResultSet rs = stmt.executeQuery(sql);
+//
+//			while(rs.next()){
+//
+//				int numeroFactura = rs.getInt("numero");
+//				int idPaquete = rs.getInt("paqueteid");
+//
+//				Calendar fecha = Calendar.getInstance();
+//				fecha.setTime(rs.getDate("fecha"));
+//
+//				char tipo = rs.getString("tipo").charAt(0);
+//				double importe = rs.getDouble("importe");
+//
+//				PaquetesDao paquetesDao = new PaquetesDao();
+//
+//				Paquetes paquete = paquetesDao.getPaqueteById(idPaquete);
+//				paquete.generarFactura(numeroFactura, fecha, tipo, importe);
+//			}
+//			
+//		}catch(Exception e){
+//
+//			System.out.println("Error al cargar las facturas.");
+//
+//		}
+//	}
 	
-	private static void loadNextId() {
+	public void loadFacturaById(int id, Paquetes paquete) {
 
-		File idFacturaFile = new File("./archivos/ID_FACTURAS.txt");
-		Scanner facturaScanner;
+		try{
+			String sql = 
+					"select f.fecha fecha, f.importe importe, f.numero numero, f.tipo tipo " +
+					"from Facturas f " +
+					"where f.id = " + id;
 
-		try {
+			Statement stmt = this.conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
 
-			try {
-				idFacturaFile.createNewFile();
+			while(rs.next()){
 
-			} catch (IOException e) {
+				int numeroFactura = rs.getInt("numero");
+				
+				Calendar fecha = Calendar.getInstance();
+				fecha.setTime(rs.getDate("fecha"));
 
-				System.out.println("Se ha verificado un error al cargar el archivo de id.");
+				char tipo = rs.getString("tipo").charAt(0);
+				double importe = rs.getDouble("importe");
+
+				paquete.generarFactura(numeroFactura, fecha, tipo, importe);
 			}
-
-			facturaScanner = new Scanner(idFacturaFile);
-
-			nextIdFactura = facturaScanner.nextInt();
-
-			facturaScanner.close();
-
-		}catch(InputMismatchException e){
-
-			System.out.println("Se ha encontrado un tipo de dato insesperado.");
-
-		}catch(FileNotFoundException e) {
-
-			System.out.println("No se ha encontrado el archivo.");
-
+			
 		}catch(Exception e){
 
-			e.printStackTrace();
+			System.out.println("Error al cargar la factura.");
+
 		}
-
 	}
-
-	public static int getNextIdFactura() {
-
-		nextIdFactura++;
-
-		return nextIdFactura;
-	}
-
-	public static int getIdFacturaActual(){
-
-		return nextIdFactura;
-	}
-
-//	public void generarFactura(Paquetes paquete) {
-//		
-//		Facturas factura = paquete.generarFactura();
-//	}
+	
 }

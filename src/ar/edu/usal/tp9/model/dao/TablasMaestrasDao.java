@@ -1,17 +1,13 @@
 package ar.edu.usal.tp9.model.dao;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.Scanner;
 
-import ar.edu.usal.tp9.model.dto.Hoteles;
-import ar.edu.usal.tp9.model.dto.Pasajeros;
-import ar.edu.usal.tp9.utils.Validador;
+import ar.edu.usal.tp9.utils.DbConnection;
 
 public class TablasMaestrasDao {
 
@@ -20,10 +16,15 @@ public class TablasMaestrasDao {
 	private HashMap<String,Double> localidadesImportesMap;
 	private HashMap<String,ArrayList<String>> turnoHorariosMap;
 
+	private Connection conn;
+	
 	private TablasMaestrasDao(){
 		
 		this.turnoHorariosMap = new HashMap<String, ArrayList<String>>();
 		this.localidadesImportesMap = new HashMap<String, Double>();
+		
+		DbConnection dbConn = DbConnection.getInstance();
+		this.conn = dbConn.getConnection();
 		
 		this.loadLocalidades();
 		this.loadHorariosViajes();
@@ -40,91 +41,51 @@ public class TablasMaestrasDao {
 	}
 	
 	private void loadLocalidades() {
-		
-		File localidadesTxt = new File("./archivos/LOCALIDADES.txt");
-		Scanner localidadesScanner;
-		
-		try {
-			
-			try {
-				localidadesTxt.createNewFile();
-			
-			} catch (IOException e) {
 
-				System.out.println("Se ha verificado un error al cargar el archivo de localidades.");
-			}
-			
-			localidadesScanner = new Scanner(localidadesTxt);
-			
-			while(localidadesScanner.hasNextLine()){
-				
-//				String localidad = localidadesScanner.nextLine().trim();				
-//				this.localidades.add(localidad);
-				
-				String linea = localidadesScanner.nextLine();
-				String[] lineaArray = linea.split(";");
-				
-				String localidad = lineaArray[0].trim();
-				Double importe = Double.valueOf(lineaArray[1].trim());
-				
+		try {
+			String sql = "SELECT localidad, importe FROM Localidades";
+
+			Statement stmt = this.conn.createStatement();		
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+
+				String localidad = rs.getString("localidad");
+				Double importe = rs.getDouble("importe");
+
 				this.localidadesImportesMap.put(localidad, importe);
 			}
-			
-			localidadesScanner.close();
-			
-		}catch(InputMismatchException e){
-			
-			System.out.println("Se ha encontrado un tipo de dato insesperado.");
-			
-		}catch (FileNotFoundException e) {
-			
-			System.out.println("No se ha encontrado el archivo.");
+		}catch (Exception e) {
+
+			System.out.println("Se ha verificado un error al cargar las localidades.");
 		}
 	}	
 	
 	public void loadHorariosViajes(){
-		
-		File horariosTxt = new File("./archivos/HORARIOS.txt");
-		Scanner horariosScanner;
-		
-		try {
-			
-			try {
-				horariosTxt.createNewFile();
-			
-			} catch (IOException e) {
 
-				System.out.println("Se ha verificado un error al cargar el archivo de horarios.");
-			}
-			
-			horariosScanner = new Scanner(horariosTxt);
-						
-			while(horariosScanner.hasNextLine()){
-				
-				String linea = horariosScanner.nextLine();
-				int id = Integer.valueOf(linea.substring(0, 4));
-				String horario = linea.substring(4, 9).trim();
-				String turno = linea.substring(9, 24).trim();
-				
+		try {
+
+			String sql = "SELECT turno, horario FROM Horarios";
+			Statement stmt = this.conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while(rs.next()){
+
+				String turno = rs.getString("turno");
+				Time horario = rs.getTime("horario");
+
 				if(this.turnoHorariosMap.get(turno) != null){
-					
-					this.turnoHorariosMap.get(turno).add(horario);
+
+					this.turnoHorariosMap.get(turno).add(horario.toString());
 				}else{
-					
+
 					this.turnoHorariosMap.put(turno, new ArrayList<String>());
-					this.turnoHorariosMap.get(turno).add(horario);
+					this.turnoHorariosMap.get(turno).add(horario.toString());
 				}
 			}
-			
-			horariosScanner.close();
-			
-		}catch(InputMismatchException e){
-			
-			System.out.println("Se ha encontrado un tipo de dato insesperado.");
-			
-		}catch (FileNotFoundException e) {
-			
-			System.out.println("No se ha encontrado el archivo.");
+		}catch (Exception e) {
+
+			System.out.println("Error al cargar los horarios.");
 		}
 	}
 

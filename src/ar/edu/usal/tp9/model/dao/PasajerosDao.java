@@ -1,26 +1,29 @@
 package ar.edu.usal.tp9.model.dao;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.InputMismatchException;
 import java.util.Iterator;
-import java.util.Scanner;
 
 import ar.edu.usal.tp9.model.dto.Pasajeros;
-import ar.edu.usal.tp9.utils.Validador;
+import ar.edu.usal.tp9.utils.DbConnection;
 
 public class PasajerosDao {
 
 	private static PasajerosDao pasajerosDaoInstance = null;
 
+	private Connection conn;
+	
 	private ArrayList<Pasajeros> pasajeros;
 
 	private PasajerosDao(){
 		
 		this.pasajeros = new ArrayList<Pasajeros>();
+		
+		DbConnection dbConn = DbConnection.getInstance();
+		this.conn = dbConn.getConnection();
 		
 		this.loadPasajeros();
 	}
@@ -36,44 +39,29 @@ public class PasajerosDao {
 	}
 	
 	private void loadPasajeros() {
-		
-		File clientesTxt = new File("./archivos/CLIENTES.txt");
-		Scanner clientesScanner;
-		
-		try {
-			
-			try {
-				clientesTxt.createNewFile();
-			
-			} catch (IOException e) {
 
-				System.out.println("Se ha verificado un error al cargar el archivo de clientes.");
-			}
-			
-			clientesScanner = new Scanner(clientesTxt);
-			
-			while(clientesScanner.hasNextLine()){
-				
-				String linea = clientesScanner.nextLine();
-				String[] clientesArray = linea.split(";");
-				
-				String nombreApellido = clientesArray[0].trim();
-				Calendar fechaNacimiento = Validador.stringToCalendar(clientesArray[1].trim(), "yyyyMMdd");
-				int dni = Integer.valueOf(clientesArray[2].trim());
-				String email = clientesArray[3].trim();
-				
+		try {
+
+			String sql = "SELECT nombre_apellido, fecha_nacimiento, dni, email";
+
+			Statement stmt = this.conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while(rs.next()){
+
+				String nombreApellido = rs.getString("nombre_apellido");
+
+				Calendar fechaNacimiento = Calendar.getInstance();
+				fechaNacimiento.setTime(rs.getDate("fecha_nacimiento"));
+
+				int dni = rs.getInt("dni");
+				String email = rs.getString("email");
+
 				this.pasajeros.add(new Pasajeros(nombreApellido, fechaNacimiento, dni, email));
 			}
-			
-			clientesScanner.close();
-			
-		}catch(InputMismatchException e){
-			
-			System.out.println("Se ha encontrado un tipo de dato insesperado.");
-			
-		}catch (FileNotFoundException e) {
-			
-			System.out.println("No se ha encontrado el archivo.");
+		}catch(Exception e){
+
+			System.out.println("Error al cargar los pasajeros.");
 		}
 	}
 	

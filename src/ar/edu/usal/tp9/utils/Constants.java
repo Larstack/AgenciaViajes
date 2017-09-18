@@ -13,5 +13,6 @@ public class Constants {
 	
 	public static final FlowLayout ESTILO_LAYOUT = new FlowLayout(FlowLayout.CENTER, 5, 10);
 	
-	public static final char TIPO_FACTURA = 'A'; 
+	public static final char TIPO_FACTURA = 'A';
+
 }

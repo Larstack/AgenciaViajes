@@ -34,33 +34,7 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 		this.consultaActualizacionView = consultaActualizacionView;
 		
 	}
-	
-	
-//	public ArrayList<Pasajeros> getPasajerosFromTxt() {
-//
-//		PasajerosDao pasajerosDao = PasajerosDao.getInstance();
-//		Iterator it = pasajerosDao.getPasajeros().iterator();
-//		
-////		ArrayList<String> nombresPasajeros = new ArrayList<String>();
-////		ArrayList<Integer> documentosPasajeros = new ArrayList<Integer>();
-////		nombresPasajeros.add("Seleccionar");
-//		
-//		while (it.hasNext()) {
-//		
-//			Pasajeros pasajeroTmp = ((Pasajeros) it.next());
-//			
-//			nombresPasajeros.add(pasajeroTmp.getNombreApellido());
-//			documentosPasajeros.add(pasajeroTmp.getDni());			
-//		}
-//		
-//		ArrayList listaDatosPasajeros = new ArrayList<>();
-//		listaDatosPasajeros.add(nombresPasajeros);
-//		listaDatosPasajeros.add(documentosPasajeros);
-//		
-//		return listaDatosPasajeros;		
-//	}
-	
-	//LR cafe Martinez
+
 	public ArrayList getPasajerosListasFromTxt() {
 
 		PasajerosDao pasajerosDao = PasajerosDao.getInstance();
@@ -85,7 +59,7 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 		return listaDatosPasajeros;		
 	}
 	
-	public Object[] getLocalidadesFromTxt() {
+	public Object[] getLocalidadesFromDb() {
 		
 		TablasMaestrasDao tablasMaestrasDao = TablasMaestrasDao.getInstance();
 		tablasMaestrasDao.getLocalidades().add(0,"Seleccionar");
@@ -102,13 +76,13 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 			Pasajeros pasajero = (Pasajeros) this.consultaActualizacionView.getCmbPasajeros().getSelectedItem();
 			
 			String localidadString = ((String) this.consultaActualizacionView.getCmbLocalidades().getSelectedItem()).trim();
-			
-			PaquetesDao paquetesDao = PaquetesDao.getInstance();
+
+			PaquetesDao paquetesDao = new PaquetesDao();
 			
 			try {
 			
 				Paquetes paqueteEncontrado = paquetesDao.getPaqueteByPasajeroLocalidad(pasajero, localidadString);
-				
+
 				String hotel = null;
 				boolean pensionCompleta = false;
 				
@@ -122,11 +96,6 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 				ArrayList<Integer> documentosPasajerosPaquete = new ArrayList<Integer>();
 
 				ArrayList<Pasajeros> pasajerosTmp = paqueteEncontrado.getPasajeros();
-//				for (int i = 0; i < pasajerosTmp.size(); i++) {
-//					
-//					nombresPasajerosPaquete.add(pasajerosTmp.get(i).getNombreApellido());
-//					documentosPasajerosPaquete.add(pasajerosTmp.get(i).getDni());
-//				}
 				
 				this.consultaActualizacionView.setIdPaqueteEncontrado(paqueteEncontrado.getId());
 				this.consultaActualizacionView.fillForm(
@@ -142,7 +111,7 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 						pensionCompleta,
 						String.valueOf(paqueteEncontrado.getImporte())
 				);
-				
+
 			} catch (PaqueteNoEncontradoException ex) {
 				
 				this.consultaActualizacionView.mostrarMensajeDialog(ex.getMessage(), "Paquete No Encontrado");
@@ -154,18 +123,17 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 					this.consultaActualizacionView.getComponentesPaqueteEncontrado(), true, true);
 			
 		} else if ("Anulacion".equals(e.getActionCommand())) {
-			
+
 			int rta = JOptionPane.showConfirmDialog(null, "Quiere borrar el paquete?", 
 					"Confirmacion", JOptionPane.OK_CANCEL_OPTION);
 
 			if (rta == JOptionPane.YES_OPTION){
-			
-				PaquetesDao paquetesDao = PaquetesDao.getInstance();
-				Paquetes paquete = paquetesDao.getPaqueteById(this.consultaActualizacionView.getIdPaqueteEncontrado());
-				paquetesDao.getPaquetes().remove(paquete);
+
+				PaquetesDao paquetesDao = new PaquetesDao();
+//				Paquetes paquete = paquetesDao.getPaqueteById(this.consultaActualizacionView.getIdPaqueteEncontrado());
 				
-				boolean persistenciaOk = paquetesDao.persistirPaquetes();
-				
+				boolean persistenciaOk = paquetesDao.borrarPaquete(this.consultaActualizacionView.getIdPaqueteEncontrado());
+
 				if(persistenciaOk) {
 
 					this.consultaActualizacionView.mostrarMensajeDialog("Datos guardados con exito!", "Exito");
@@ -188,13 +156,13 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 			
 		}else if ("Aceptar".equals(e.getActionCommand())) {
 			
-			PaquetesDao paquetesDao = PaquetesDao.getInstance();
+			PaquetesDao paquetesDao = new PaquetesDao();
 			Paquetes paquete = paquetesDao.getPaqueteById(this.consultaActualizacionView.getIdPaqueteEncontrado());
 			
 			boolean persistenciaOk = false;
 			
 			if(this.consultaActualizacionView.validar()){
-				
+
 				persistenciaOk = this.guardarPaquete(paquete);
 			}
 
@@ -219,30 +187,28 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 
 	private boolean guardarPaquete(Paquetes paquete) {
 		
+		int id = paquete.getId();
+		int numeroFactura = paquete.getFacturas().getNumero(); 
+
 		if(this.consultaActualizacionView.getCmbHoteles().getSelectedIndex() > 0){
 			
 			if(!(paquete instanceof PaquetesConEstadias)){
 				
-				PaquetesDao paquetesDao = PaquetesDao.getInstance();
-				paquetesDao.getPaquetes().remove(paquete);
-				
 				paquete = new PaquetesConEstadias();
 			}
-			
+
 			HotelesDao hotelesDao = HotelesDao.getInstance();
 			
 			((PaquetesConEstadias) paquete).setHotel(hotelesDao.getHotelByNombre(((String)this.consultaActualizacionView.getCmbHoteles().getSelectedItem()).trim()));
 			((PaquetesConEstadias) paquete).setEsPensionCompleta(this.consultaActualizacionView.getEsPensionCompleta().isSelected());
-			
 		}
 
-		paquete.setId(PaquetesDao.getNextIdPaquetes());
-
+		paquete.setId(id);
 		paquete.setCantidadDias(Integer.valueOf(this.consultaActualizacionView.getTxtCantidadDias().getText()));
 
 		Calendar fechaHoraSalida = Validador.stringToCalendar(this.consultaActualizacionView.getTxtFechaSalida().getText().trim(), "dd/MM/yyyy");
 		paquete.setFechaHoraSalida(fechaHoraSalida);
-		
+
 		String horaCombo = ((String)this.consultaActualizacionView.getComboHoras().getSelectedItem()).trim();
 		int hora = Integer.valueOf(horaCombo.substring(0, 2));
 		int minutos = Integer.valueOf(horaCombo.substring(3, 5));
@@ -254,10 +220,7 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 		ArrayList<String> localidades = (ArrayList<String>) this.consultaActualizacionView.getListaLocalidadesCopia().getSelectedValuesList();
 		paquete.setLocalidades(localidades);
 		
-		PasajerosDao pasajerosDao = PasajerosDao.getInstance();
-//		Pasajeros pasajero = this.consultaActualizacionView.getCmbPasajerosPaquete().getSelectedItem()));
-				
-//		paquete.setPasajeros(pasajeros);
+//		PasajerosDao pasajerosDao = PasajerosDao.getInstance();
 		
 		ArrayList<Pasajeros> pasajeros = new ArrayList<Pasajeros>(); 
 		ListModel modelPasajeros = this.consultaActualizacionView.getListaPasajerosCopia().getModel();
@@ -274,16 +237,14 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 				equals("Si") ? true : false);
 		
 		//Se genera la factura correspondiente.
-		FacturasDao facturasDao = FacturasDao.getInstance();
 		paquete.generarFactura();
-		
-		PaquetesDao paquetesDao = PaquetesDao.getInstance();
-		paquetesDao.getPaquetes().add(paquete);
-		
-		return paquetesDao.persistirPaquetes();
+		paquete.getFacturas().setNumero(numeroFactura);
+		PaquetesDao paquetesDao = new PaquetesDao();
+
+		return paquetesDao.updatePaquete(paquete);
 	}
 	
-	public Object[] getHotelesFromTxt() {
+	public Object[] getHotelesFromDb() {
 		
 		HotelesDao hotelesDao = HotelesDao.getInstance();
 		Iterator it = hotelesDao.getHoteles().iterator();
@@ -300,7 +261,7 @@ public class ConsultaActualizacionController implements ActionListener, ICalculo
 		return nombresHoteles.toArray();
 	}
 	
-	public Object[] getTurnosFromTxt() {
+	public Object[] getTurnosFromDb() {
 		
 		TablasMaestrasDao tablasMaestrasDao = TablasMaestrasDao.getInstance();
 		HashMap turnosHorariosMap = tablasMaestrasDao.getTurnoHorariosMap();

@@ -46,8 +46,6 @@ public class ConsultaActualizacionView {
 //	private JLabel lblPasajeroPaquete = new JLabel("Pasajero: ");
 //	private JComboBox cmbPasajerosPaquete;
 	
-	///////////////  20170913
-	
 	private JLabel lblPasajero = new JLabel("Pasajero: ");
 	private JComboBox cmbPasajeros;
 
@@ -61,9 +59,7 @@ public class ConsultaActualizacionView {
 	private JList listaPasajerosCopia;
 	private JScrollPane scrPane2Copia;
 	private JPanel pnl2Copia;
-	
-	//////////////
-	
+
 	private JLabel lblLocalidadesPaquete = new JLabel("Localidades: ");
 	private JList listaLocalidadesOriginal;
 	private JScrollPane scrPaneOriginal;
@@ -120,16 +116,15 @@ public class ConsultaActualizacionView {
 		
 		GuiUtilities.aplicarFormatoVentana(ventana);
 		
-		cmbHorarios = new JComboBox(this.consultaActualizacionController.getTurnosFromTxt());
+		cmbHorarios = new JComboBox(this.consultaActualizacionController.getTurnosFromDb());
 
-		///////////
 		PasajerosDao pasajerosDao = PasajerosDao.getInstance();
 		ArrayList<Pasajeros> pasajerosList = pasajerosDao.getPasajeros();
 		
 		Object[] pasajeros = pasajerosList.toArray();
 		cmbPasajeros = new JComboBox(pasajeros);
 
-		cmbLocalidades = new JComboBox(this.consultaActualizacionController.getLocalidadesFromTxt());
+		cmbLocalidades = new JComboBox(this.consultaActualizacionController.getLocalidadesFromDb());
 		
 		GuiUtilities.setearComandoBoton(btnConsultar, "Consultar", consultaActualizacionController);
 		GuiUtilities.setearComandoBoton(btnModificar, "Modificacion", consultaActualizacionController);
@@ -146,8 +141,6 @@ public class ConsultaActualizacionView {
 		
  		int opcionSeleccion = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
 
-		/////////////////////////////////
-
 		listaPasajerosOriginal = new JList(pasajeros);		
 		GuiUtilities.aplicarFormatoLista(ventana, listaPasajerosOriginal, opcionSeleccion);
 		scrPane2Original = new JScrollPane(listaPasajerosOriginal); 
@@ -163,9 +156,8 @@ public class ConsultaActualizacionView {
 		
 		pnl2Copia = new JPanel();
 		GuiUtilities.aplicarFormatoPanel(ventana, pnl2Copia, listaPasajerosOriginal, listaPasajerosCopia);
-		/////////////////////////////////
 		
-		listaLocalidadesOriginal = new JList(this.consultaActualizacionController.getLocalidadesFromTxt());
+		listaLocalidadesOriginal = new JList(this.consultaActualizacionController.getLocalidadesFromDb());
 		GuiUtilities.aplicarFormatoLista(ventana, listaLocalidadesOriginal, opcionSeleccion);
 		scrPaneOriginal = new JScrollPane(listaLocalidadesOriginal); 
 
@@ -216,7 +208,7 @@ public class ConsultaActualizacionView {
 		leyenda.setBorder(BorderFactory.createLineBorder(Color.RED));
 		leyenda.setVisible(false);
 		
-		cmbHoteles = new JComboBox(this.consultaActualizacionController.getHotelesFromTxt());
+		cmbHoteles = new JComboBox(this.consultaActualizacionController.getHotelesFromDb());
 		
 		GuiUtilities.aplicarFormatoTextField(ventana, txtImporte);
 		txtImporte.setEditable(false);

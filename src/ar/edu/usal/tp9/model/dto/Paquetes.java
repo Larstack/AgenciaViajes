@@ -24,6 +24,7 @@ public class Paquetes {
 	public Paquetes(int id, ArrayList<String> localidades, Calendar fechaHoraSalida,
 			int cantidadDias, double importe, boolean tieneSeguro,
 			ArrayList<Pasajeros> pasajeros, boolean quiereVisitasGuiadas, boolean quiereAbonoTransporteLocal) {
+		
 		super();
 		this.id = id;
 		this.localidades = localidades;
@@ -34,7 +35,6 @@ public class Paquetes {
 		this.pasajeros = pasajeros;
 		this.quiereVisitasGuiadas = quiereVisitasGuiadas;
 		this.quiereAbonoTransporteLocal = quiereAbonoTransporteLocal;
-		
 	}
 
 	public ArrayList<String> getLocalidades() {
@@ -89,24 +89,20 @@ public class Paquetes {
 		
 		this.factura = new Facturas();
 		
-		this.factura.setNumero(FacturasDao.getNextIdFactura());
 		this.factura.setFecha(Calendar.getInstance());
 		this.factura.setImporte(this.importe);
 		this.factura.setTipo(Constants.TIPO_FACTURA);
-		
 	}
 
-	public void generarFactura(int numeroFactura, int idPaquete, Calendar fecha, char tipo,
-			double importe) {
+	public void generarFactura(int numeroFactura, Calendar fecha, char tipo, double importe) {
 
 		this.factura = new Facturas();
 		
 		this.factura.setFecha(fecha);
 		this.factura.setImporte(importe);
 		this.factura.setNumero(numeroFactura);
-//		this.factura.setPasajero(pasajero);
 		this.factura.setTipo(tipo);
-	}	
+	}
 
 	public Facturas getFacturas() {
 		return factura;

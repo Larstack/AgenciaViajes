@@ -3,6 +3,7 @@ package ar.edu.usal.tp9.model.dto;
 
 public class Hoteles {
 
+	private int id;
 	private String nombre;
 	private double importe;
 	private int estrellas;
@@ -45,6 +46,14 @@ public class Hoteles {
 
 	public void setImporte(double importe) {
 		this.importe = importe;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 }

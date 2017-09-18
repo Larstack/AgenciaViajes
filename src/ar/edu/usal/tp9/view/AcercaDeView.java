@@ -1,7 +1,5 @@
 package ar.edu.usal.tp9.view;
 
-import java.awt.FlowLayout;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
@@ -15,8 +13,8 @@ public class AcercaDeView {
 	private static final String LEYENDA_VERSION = "Version: ";
 	private static final String LEYENDA_ANIO = "Año: ";
 	private static final String LEYENDA_AUTORES = "Autores: ";
-	private static final String NOMBRE = "TP 9";
-	private static final String VERSION = "1.0";
+	private static final String NOMBRE = "Agencia Viajes";
+	private static final String VERSION = "2.0";
 	private static final String ANIO = "2017";
 	private static final String AUTORES = "Sandobal - Ricciotti";
 		

@@ -126,7 +126,7 @@ public class IngresoView {
 		pnl2Copia = new JPanel();
 		GuiUtilities.aplicarFormatoPanel(ventana, pnl2Copia, listaPasajerosOriginal, listaPasajerosCopia);
 
-		listaLocalidadesOriginal = new JList(this.ingresoController.getLocalidadesFromTxt());
+		listaLocalidadesOriginal = new JList(this.ingresoController.getLocalidadesFromDb());
 		GuiUtilities.aplicarFormatoLista(ventana, listaLocalidadesOriginal, opcionSeleccion);
 		scrPaneOriginal = new JScrollPane(listaLocalidadesOriginal); 
 
@@ -177,7 +177,7 @@ public class IngresoView {
 		leyenda.setBorder(BorderFactory.createLineBorder(Color.RED));
 		leyenda.setVisible(false);
 
-		cmbHoteles = new JComboBox(this.ingresoController.getHotelesFromTxt());
+		cmbHoteles = new JComboBox(this.ingresoController.getHotelesFromDb());
 
 		GuiUtilities.aplicarFormatoTextField(ventana, txtImporte);
 		txtImporte.setEditable(false);

@@ -473,6 +473,7 @@ public class Validador {
 		// "dd/MM/yyyy"
 		// "dd-MM-yyyy"
 		// "yyyyMMdd"	
+		// "yyyyMMdd HH:mm:ss"
 
 		Date fechaDate = fecha.getTime();
 		DateFormat formatter = new SimpleDateFormat(formatoFecha);
