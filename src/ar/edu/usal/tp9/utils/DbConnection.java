@@ -9,9 +9,7 @@ public class DbConnection {
 	private static DbConnection dbConnectionInstance = null;
 	
 	private String dbDriver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-	private String dbServer = "jdbc:sqlserver://localhost:1433;databaseName=TP_Programacion_Avanzada";
-	private String dbUser = "Larstack";
-	private String dbPassword = "mr9till5";
+	private String dbServer = "jdbc:sqlserver://localhost:1433;databaseName=TP_Programacion_Avanzada;integratedSecurity=true;";
 	
 	private Connection connection;
 	
@@ -20,7 +18,7 @@ public class DbConnection {
 		try {
 			
 			Class.forName(this.dbDriver);
-			this.connection = DriverManager.getConnection(dbServer,dbUser,dbPassword);
+			this.connection = DriverManager.getConnection(dbServer);
 		
 		} catch (ClassNotFoundException e) {
 			

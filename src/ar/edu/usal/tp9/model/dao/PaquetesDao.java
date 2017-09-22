@@ -491,7 +491,7 @@ public class PaquetesDao {
 			}
 			pasajeros = pasajeros.substring(0,pasajeros.length()-1);
 
-			CallableStatement callStmt = this.conn.prepareCall("{call sp_persistir_paquete(?,?,?,?,?,?,?,?,?,?,?,?,?,)}");
+			CallableStatement callStmt = this.conn.prepareCall("{call sp_ingresar_nuevo_paquete(?,?,?,?,?,?,?,?,?,?,?)}");
 			callStmt.setDouble(1, importe);
 			callStmt.setString(2, String.valueOf(tipoFactura));
 			callStmt.setBoolean(3, tieneSeguro);
@@ -499,14 +499,14 @@ public class PaquetesDao {
 			callStmt.setBoolean(5, quiereAbonoTransporteLocal);
 			callStmt.setBoolean(6, esPensionCompleta);
 			callStmt.setInt(7, hotelId);
-			callStmt.setBoolean(8, esPensionCompleta);
-			callStmt.setDate(9, fechaHoraSalida);
-			callStmt.setInt(10, cantidadDias);
-			callStmt.setString(11, localidades);
-			callStmt.setString(12, pasajeros);
+			callStmt.setDate(8, fechaHoraSalida);
+			callStmt.setInt(9, cantidadDias);
+			callStmt.setString(10, localidades);
+			callStmt.setString(11, pasajeros);
 
-			return callStmt.execute();
+			callStmt.execute();
 
+			return true;
 		}catch(Exception e){
 
 			e.printStackTrace();
@@ -659,7 +659,7 @@ public class PaquetesDao {
 					"	paq.quiere_visita_guiada quiere_visita_guiada, " +
 					"	paq.quiere_abono_transporte_local quiere_abono_transporte_local, " +
 					"	paq.hotel_id hotel_id, " +
-					"	paq.es_pension_completa es_pension_completa, " +
+					"	paq.es_pension_completa es_pension_completa " +
 					"from Paquetes paq " +
 //					"	inner join LocalidadesPaquetes lp on paq.id = lp.paquete_id " +
 					"		inner join PasajerosPaquetes pp on paq.id = pp.paquete_id " +

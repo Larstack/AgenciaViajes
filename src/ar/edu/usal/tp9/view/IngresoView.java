@@ -400,7 +400,7 @@ public class IngresoView {
 			}
 		}
 
-		if(this.cmbHorarios.getSelectedIndex() <= 0){
+		if(this.cmbHorarios.getSelectedIndex() < 0){
 
 			errores.add("turno");
 		}

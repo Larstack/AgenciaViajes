@@ -35,7 +35,7 @@ public class ConsultaMasivaController implements ActionListener {
 			String cantidadRegistrosTotales = "";
 
 			String pasajeroTxt = consultaMasivaView.getPasajero().getText();
-			PaquetesDao paquetesDao = PaquetesDao.getInstance();
+			PaquetesDao paquetesDao = new PaquetesDao();
 
 			if(pasajeroTxt != null && !pasajeroTxt.trim().isEmpty()){
 
@@ -45,7 +45,7 @@ public class ConsultaMasivaController implements ActionListener {
 				paquetesEncontrados = paquetesDao.getPaqueteByPasajero(pasajeroEncontrado);
 			}else{
 
-				paquetesEncontrados = paquetesDao.getPaquetes();
+//				paquetesEncontrados = paquetesDao.getPaquetes();
 			}
 			if(paquetesEncontrados != null && !paquetesEncontrados.isEmpty()){
 
@@ -86,7 +86,7 @@ public class ConsultaMasivaController implements ActionListener {
 			}
 
 			cantidadRegistros = String.valueOf(registros.size());
-			cantidadRegistrosTotales = String.valueOf(paquetesDao.getPaquetes().size());
+//			cantidadRegistrosTotales = String.valueOf(paquetesDao.getPaquetes().size());
 
 			this.consultaMasivaView.mostrarRegistros(registros, cantidadRegistros, cantidadRegistrosTotales);	
 		}

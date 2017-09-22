@@ -42,7 +42,7 @@ public class PasajerosDao {
 
 		try {
 
-			String sql = "SELECT nombre_apellido, fecha_nacimiento, dni, email";
+			String sql = "SELECT nombre_apellido, fecha_nacimiento, dni, email FROM pasajeros";
 
 			Statement stmt = this.conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);

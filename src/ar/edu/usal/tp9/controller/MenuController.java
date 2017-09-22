@@ -2,7 +2,9 @@ package ar.edu.usal.tp9.controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
+import ar.edu.usal.tp9.utils.DbConnection;
 import ar.edu.usal.tp9.view.AcercaDeView;
 import ar.edu.usal.tp9.view.ConsultaActualizacionView;
 import ar.edu.usal.tp9.view.ConsultaMasivaView;
@@ -28,6 +30,18 @@ public class MenuController implements ActionListener {
 		} else if ("Acerca de".equals(e.getActionCommand())) {
 			AcercaDeView acercaDeView = new AcercaDeView();
 		} else if ("Salir".equals(e.getActionCommand())){
+			
+			DbConnection db = DbConnection.getInstance();
+			
+			try {
+				
+				db.getConnection().close();
+				
+			} catch (SQLException e1) {
+				
+				e1.printStackTrace();
+			}
+			
 			System.exit(0);
 		}
 	}

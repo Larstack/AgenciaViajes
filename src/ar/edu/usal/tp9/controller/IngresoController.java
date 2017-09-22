@@ -117,22 +117,22 @@ public class IngresoController implements ActionListener, ICalculoImporte {
 			
 			TablasMaestrasDao tablasMaestrasDao = TablasMaestrasDao.getInstance();
 			
-			if (ingresoView.getComboHorariosIndex() == 1) {
+			if (ingresoView.getComboHorariosIndex() == 0) {
 				ingresoView.getComboModel().removeAllElements();
-				for (int j = 0; j < tablasMaestrasDao.getTurnoHorariosMap().get("Manana").size(); j++) {
-					ingresoView.getComboHoras().addItem(tablasMaestrasDao.getTurnoHorariosMap().get("Manana").get(j));
+				for (int j = 0; j < tablasMaestrasDao.getTurnoHorariosMap().get("MANANA").size(); j++) {
+					ingresoView.getComboHoras().addItem(tablasMaestrasDao.getTurnoHorariosMap().get("MANANA").get(j));
 				}
 
-			} else if (ingresoView.getComboHorariosIndex() == 2) {
+			} else if (ingresoView.getComboHorariosIndex() == 1) {
 				ingresoView.getComboModel().removeAllElements();
-				for (int j = 0; j < tablasMaestrasDao.getTurnoHorariosMap().get("Tarde").size(); j++) {
-					ingresoView.getComboHoras().addItem(tablasMaestrasDao.getTurnoHorariosMap().get("Tarde").get(j));
+				for (int j = 0; j < tablasMaestrasDao.getTurnoHorariosMap().get("TARDE").size(); j++) {
+					ingresoView.getComboHoras().addItem(tablasMaestrasDao.getTurnoHorariosMap().get("TARDE").get(j));
 				}
 	
-			} else if (ingresoView.getComboHorariosIndex() == 3) {
+			} else if (ingresoView.getComboHorariosIndex() == 2) {
 				ingresoView.getComboModel().removeAllElements();
-				for (int j = 0; j < tablasMaestrasDao.getTurnoHorariosMap().get("Noche").size(); j++) {
-					ingresoView.getComboHoras().addItem(tablasMaestrasDao.getTurnoHorariosMap().get("Noche").get(j));
+				for (int j = 0; j < tablasMaestrasDao.getTurnoHorariosMap().get("NOCHE").size(); j++) {
+					ingresoView.getComboHoras().addItem(tablasMaestrasDao.getTurnoHorariosMap().get("NOCHE").get(j));
 				}
 	
 			} 
