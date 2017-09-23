@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -37,55 +38,6 @@ public class PaquetesDao {
 
 		DbConnection dbConn = DbConnection.getInstance();
 		this.conn = dbConn.getConnection();
-	}
-
-	private ArrayList<String> loadLocalidades(int idPaquete) {
-
-		File localidadesTxt = new File("./archivos/PAQUETES_LOCALIDADES.txt");
-		Scanner localidadesScanner;
-
-		ArrayList<String> localidadesPaqueteList = new ArrayList<>();
-
-		try {
-
-			try {
-				localidadesTxt.createNewFile();
-
-			} catch (IOException e) {
-
-				System.out.println("Se ha verificado un error al cargar el archivo de localidades.");
-			}
-
-			localidadesScanner = new Scanner(localidadesTxt);
-
-			while(localidadesScanner.hasNextLine()){
-
-				String lineaPaqueteLocalidades = localidadesScanner.nextLine().trim();
-				String[] arrayPaqueteLocalidades = lineaPaqueteLocalidades.split(";");
-
-				if(Integer.parseInt(arrayPaqueteLocalidades[0].trim()) == idPaquete){
-
-					for (int i = 1; i < arrayPaqueteLocalidades.length; i++) {
-
-						localidadesPaqueteList.add(arrayPaqueteLocalidades[i].trim());
-					}
-
-					break;
-				}
-			}
-
-			localidadesScanner.close();
-
-		}catch(InputMismatchException e){
-
-			System.out.println("Se ha encontrado un tipo de dato insesperado.");
-
-		}catch (FileNotFoundException e) {
-
-			System.out.println("No se ha encontrado el archivo.");
-		}
-
-		return localidadesPaqueteList;
 	}
 
 	public boolean persistirPaquete(Paquetes paquete) {
@@ -202,7 +154,7 @@ public class PaquetesDao {
 
 			String updateFactura = "update Facturas set " +
 					" fecha = getDate(), importe = " + String.valueOf(factura.getImporte()) +
-					" ,tipo = " + factura.getTipo() +
+					" ,tipo = '" + factura.getTipo() + "' " +
 					" where numero = " + String.valueOf(factura.getNumero());
 
 			Statement stmt = this.conn.createStatement();
@@ -225,15 +177,15 @@ public class PaquetesDao {
 			}
 
 			String updatePaquete = "update Paquetes set " +
-					"		fecha_hora_salida = " + Validador.calendarToString(paquete.getFechaHoraSalida(), "yyyyMMdd HH:mm:ss") + "' " + 
+					"		fecha_hora_salida = '" + Validador.calendarToString(paquete.getFechaHoraSalida(), "yyyyMMdd HH:mm:ss") + "' " + 
 					"		,cantidad_dias = " + String.valueOf(paquete.getCantidadDias()) +
-					"		,importe " + String.valueOf(paquete.getImporte()) +
-					"		,tiene_seguro " + tieneSeguro +
-					"		,factura_id " + facturaId +
-					"		,quiere_visita_guiada " + quiereVisitaGuiada +
-					"		,quiere_abono_transporte_local " + quiereAbonoTransporteLocal +
-					"		,es_pension_completa " + esPensionCompleta +
-					"		hotel_id = " + hotelId +
+					"		,importe = " + String.valueOf(paquete.getImporte()) +
+					"		,tiene_seguro = " + tieneSeguro +
+					"		,factura_id = " + facturaId +
+					"		,quiere_visita_guiada = " + quiereVisitaGuiada +
+					"		,quiere_abono_transporte_local = " + quiereAbonoTransporteLocal +
+					"		,es_pension_completa = " + esPensionCompleta +
+					"		, hotel_id = " + hotelId +
 					" where id = " + paquete.getId();
 
 			stmt.execute(updatePaquete);
@@ -245,7 +197,7 @@ public class PaquetesDao {
 			}
 			localidades = localidades.substring(0,localidades.length()-1);
 
-			String sqlDeleteLocalidades = "delete from LocalidadesPaquete where paquete_id = " + paquete.getId(); 
+			String sqlDeleteLocalidades = "delete from LocalidadesPaquetes where paquete_id = " + paquete.getId(); 
 			stmt.execute(sqlDeleteLocalidades);
 			
 			String insertLocalidadesPaquetes =
@@ -263,7 +215,7 @@ public class PaquetesDao {
 			}
 			pasajeros = pasajeros.substring(0,pasajeros.length()-1);
 
-			String sqlDeletePasajeros = "delete from PasajerosPaquete where paquete_id = " + paquete.getId(); 
+			String sqlDeletePasajeros = "delete from PasajerosPaquetes where paquete_id = " + paquete.getId(); 
 			stmt.execute(sqlDeletePasajeros);
 			
 			String insertPasajerosPaquetes =
@@ -287,9 +239,19 @@ public class PaquetesDao {
 
 		try {
 
-			String deletePaquete = "delete from Paquetes where id = " + id;
+			String deleteLocalidades = "delete from LocalidadesPaquetes where paquete_id = " + id;
 
 			Statement stmt = this.conn.createStatement();
+			stmt.execute(deleteLocalidades);
+			
+			String deletePasajeros = "delete from PasajerosPaquetes where paquete_id = " + id;
+
+			stmt = this.conn.createStatement();
+			stmt.execute(deletePasajeros);
+			
+			String deletePaquete = "delete from Paquetes where id = " + id;
+
+			stmt = this.conn.createStatement();
 			stmt.execute(deletePaquete);
 
 			return true;
@@ -300,6 +262,7 @@ public class PaquetesDao {
 		
 		return false;
 	}
+	
 	public boolean persistirPaqueteSP(Paquetes paquete) {
 
 		try{
@@ -317,7 +280,6 @@ public class PaquetesDao {
 				esPensionCompleta = ((PaquetesConEstadias)paquete).isEsPensionCompleta();
 				hotelId = ((PaquetesConEstadias)paquete).getHotel().getId();
 			}
-			//		Validador.calendarToString(paquete.getFechaHoraSalida(), "yyyyMMdd HH:mm:ss") + "' " +
 
 			Date fechaHoraSalida = new Date(paquete.getFechaHoraSalida().getTimeInMillis());
 			int cantidadDias = paquete.getCantidadDias();
@@ -362,137 +324,27 @@ public class PaquetesDao {
 
 	public Paquetes getPaqueteById(int id) {
 
-		try{
-
-			Statement stmt = this.conn.createStatement();
-			ResultSet rs = stmt.executeQuery(
-					"SELECT " +
-							"	fecha_hora_salida, " +
-							"	cantidad_dias, " +
-							"	importe, " +
-							"	tiene_seguro, " +
-							"	factura_id, " +
-							"	quiere_visita_guiada, " +
-							"	quiere_abono_transporte_local, " +
-							"	hotel_id, " +
-							"	es_pension_completa, " +
-							"FROM Paquetes " +
-							"WHERE id = " + id
-					);
-
-			while(rs.next()){
-
-				Paquetes paquete = new Paquetes();
-
-				HotelesDao hotelesDao = HotelesDao.getInstance();
-				Hoteles hotel = null;
-				int idHotel = rs.getInt("hotel_id");
-
-				if(idHotel != 0){
-
-					paquete = new PaquetesConEstadias();
-					
-					((PaquetesConEstadias)paquete).setHotel(hotelesDao.getHotelById(idHotel));
-					((PaquetesConEstadias)paquete).setEsPensionCompleta(rs.getBoolean("es_pension_completa"));
-				}
-				
-				paquete.setId(id);
-
-				Calendar fechaHoraSalida = Calendar.getInstance();
-				fechaHoraSalida.setTime(rs.getDate("fecha_hora_salida"));
-				paquete.setFechaHoraSalida(fechaHoraSalida);
-
-				paquete.setCantidadDias(rs.getInt("cantidad_dias"));
-				paquete.setImporte(rs.getDouble("importe"));
-				paquete.setTieneSeguro(rs.getBoolean("tiene_seguro"));
-				paquete.setQuiereVisitasGuiadas(rs.getBoolean("quiere_visita_guiada"));
-				paquete.setQuiereAbonoTransporteLocal(rs.getBoolean("quiere_abono_transporte_local"));
-
-				FacturasDao facturasDao = new FacturasDao();
-				facturasDao.loadFacturaById(rs.getInt(rs.getInt("factura_id")), paquete);
-			}
-		}catch(Exception e){
-
-			e.printStackTrace();
-		}
-
-		return null;
+		ArrayList<Paquetes> paquetes = loadPaquetes(null, null, id);
+		
+		return (paquetes != null && paquetes.size() > 0) ? paquetes.get(0) : null; 
 	}
 
 	public Paquetes getPaqueteByPasajeroLocalidad(Pasajeros pasajero,
 			String localidadString) throws PaqueteNoEncontradoException {
 
-		try{
-
-			String sql = "select distinct" +
-					"	paq.id id, " +
-					"	paq.fecha_hora_salida fecha_hora_salida, " +
-					"	paq.cantidad_dias cantidad_dias, " +
-					"	paq.importe importe, " +
-					"	paq.tiene_seguro tiene_seguro, " +
-					"	paq.factura_id factura_id, " +
-					"	paq.quiere_visita_guiada quiere_visita_guiada, " +
-					"	paq.quiere_abono_transporte_local quiere_abono_transporte_local, " +
-					"	paq.hotel_id hotel_id, " +
-					"	paq.es_pension_completa es_pension_completa, " +
-					"from Paquetes paq " +
-					"	inner join LocalidadesPaquetes lp on paq.id = lp.paquete_id " +
-					"		inner join PasajerosPaquetes pp on paq.id = pp.paquete_id " +
-					"			inner join Pasajeros pas on pp.pasajero_id = pas.id " +
-					"				inner join Localidades l on lp.localidad_id = l.id " +
-					"where l.localidad = '" + localidadString + "' and pas.dni = '" + String.valueOf(pasajero.getDni()) + "' ";
-
-			Statement stmt = this.conn.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
-
-			while(rs.next()){
-
-				Paquetes paquete = new Paquetes();
-
-				HotelesDao hotelesDao = HotelesDao.getInstance();
-				Hoteles hotel = null;
-				int idHotel = rs.getInt("hotel_id");
-
-				if(idHotel != 0){
-
-					paquete = new PaquetesConEstadias();
-
-					((PaquetesConEstadias)paquete).setHotel(hotelesDao.getHotelById(idHotel));
-					((PaquetesConEstadias)paquete).setEsPensionCompleta(rs.getBoolean("es_pension_completa"));
-				}
-				
-				paquete.setId(rs.getInt("id"));
-
-				Calendar fechaHoraSalida = Calendar.getInstance();
-				fechaHoraSalida.setTime(rs.getDate("fecha_hora_salida"));
-				paquete.setFechaHoraSalida(fechaHoraSalida);
-
-				paquete.setCantidadDias(rs.getInt("cantidad_dias"));
-				paquete.setImporte(rs.getDouble("importe"));
-				paquete.setTieneSeguro(rs.getBoolean("tiene_seguro"));
-				paquete.setQuiereVisitasGuiadas(rs.getBoolean("quiere_visita_guiada"));
-				paquete.setQuiereAbonoTransporteLocal(rs.getBoolean("quiere_abono_transporte_local"));
-
-				FacturasDao facturasDao = new FacturasDao();
-				facturasDao.loadFacturaById(rs.getInt(rs.getInt("factura_id")), paquete);
-
-				return paquete;
-			}
-		}catch(Exception e){
-
-			e.printStackTrace();
-		}
-		throw new PaqueteNoEncontradoException();
+		ArrayList<Paquetes> paquetes = loadPaquetes(pasajero, localidadString, null);
+		
+		return (paquetes != null && paquetes.size() > 0) ? paquetes.get(0) : null; 
 	}
 
 	public ArrayList<Paquetes> getPaqueteByPasajero(Pasajeros pasajero) {
 
-		return loadPaquetes(pasajero);		
+		return loadPaquetes(pasajero, null, null);		
 	}
 
 	public ArrayList<Paquetes> loadTodosLosPaquetes() {
 		
-		return this.loadPaquetes(null);
+		return this.loadPaquetes(null, null, null);
 	}
 	
 	public int getCantidadTotalPaquetes() {
@@ -520,7 +372,7 @@ public class PaquetesDao {
 	}
 
 	
-	private ArrayList<Paquetes> loadPaquetes(Pasajeros pasajero) {
+	private ArrayList<Paquetes> loadPaquetes(Pasajeros pasajero, String localidad, Integer id) {
 		
 		ArrayList<Paquetes> paquetesArray = new ArrayList<Paquetes>();
 		PasajerosDao pasajerosDao = PasajerosDao.getInstance();
@@ -540,17 +392,32 @@ public class PaquetesDao {
 					"	paq.hotel_id hotel_id, " +
 					"	paq.es_pension_completa es_pension_completa " +
 					"from Paquetes paq ";
+	
+			String where = "where 1=1 ";
 
-//					"	inner join LocalidadesPaquetes lp on paq.id = lp.paquete_id " +
-//					"		inner join Localidades l on lp.localidad_id = l.id " +
+			if(id != null){
 				
+				where = where + "and paq.id = " + String.valueOf(id);
+			}
+
+			if(localidad != null && !localidad.trim().isEmpty()){
+
+				sql +=  "	inner join LocalidadesPaquetes lp on paq.id = lp.paquete_id " +
+						"		inner join Localidades l on lp.localidad_id = l.id ";
+				
+				where += "and l.localidad = '" + localidad.trim() + "' ";
+			}
+			
 			if(pasajero != null){
 
 				sql += " inner join PasajerosPaquetes pp on paq.id = pp.paquete_id " +
-					" inner join Pasajeros pas on pp.pasajero_id = pas.id " +
-					"where pas.dni = '" + String.valueOf(pasajero.getDni()) + "' ";
+					" inner join Pasajeros pas on pp.pasajero_id = pas.id ";
+				
+				where += "and pas.dni = '" + String.valueOf(pasajero.getDni()) + "' ";
 			}
-
+			
+			sql += where;
+			
 			Statement stmt = this.conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 
@@ -559,7 +426,6 @@ public class PaquetesDao {
 				Paquetes paquete = new Paquetes();
 
 				HotelesDao hotelesDao = HotelesDao.getInstance();
-				Hoteles hotel = null;
 				int idHotel = rs.getInt("hotel_id");
 
 				if(idHotel != 0){
@@ -597,5 +463,126 @@ public class PaquetesDao {
 		}
 
 		return paquetesArray;
+	}
+
+	public boolean actualizarPaqueteConsultaMasiva(Paquetes paquete) {
+		
+		boolean persistenciaOk = false;
+
+		try {
+
+			Facturas factura = paquete.getFacturas();
+
+			PreparedStatement stmt = this.conn.prepareStatement(			
+					"update Facturas set fecha = getDate(), importe = ? ,tipo = ? " +
+					"where id in (select factura_id from Paquetes where id = ?)");
+
+					stmt.setDouble(1, factura.getImporte());
+					stmt.setString(2, String.valueOf(factura.getTipo()));
+					stmt.setInt(3, paquete.getId());
+					
+			stmt.execute();
+
+			stmt = this.conn.prepareStatement(
+				"update Paquetes set " +
+				"		fecha_hora_salida = ? " + 
+				"		,cantidad_dias = ? " +
+				"		,importe = ? " +
+				"		,tiene_seguro = ? " +
+				"		,quiere_visita_guiada = ? " + 
+				"		,quiere_abono_transporte_local = ? " +
+				"		,es_pension_completa = ? " +
+				"		,hotel_id = ? " +
+				" where id = ? "
+			);
+			
+			Date fecha = new Date(paquete.getFechaHoraSalida().getTimeInMillis());
+			stmt.setDate(1, fecha);
+			stmt.setInt(2, paquete.getCantidadDias());
+			stmt.setDouble(3, paquete.getImporte());
+			stmt.setBoolean(4, paquete.isTieneSeguro());
+			stmt.setBoolean(5, paquete.isQuiereVisitasGuiadas());
+			stmt.setBoolean(6, paquete.isQuiereAbonoTransporteLocal());
+			stmt.setInt(9, paquete.getId());
+			
+			if(paquete instanceof PaquetesConEstadias){
+
+				stmt.setBoolean(7, ((PaquetesConEstadias)paquete).isEsPensionCompleta());
+				stmt.setInt(8, ((PaquetesConEstadias)paquete).getHotel().getId());
+			}else{
+				
+				stmt.setBoolean(7, false); 
+				stmt.setNull(8, java.sql.Types.INTEGER);
+			}
+
+			stmt.execute();
+
+			stmt = this.conn.prepareStatement("delete from LocalidadesPaquetes where paquete_id = ? ");
+			
+			stmt.setInt(1,paquete.getId()); 
+			
+			stmt.execute();
+
+			String sql = "insert into LocalidadesPaquetes(paquete_id, localidad_id) " +
+					"select ? , l.id from Localidades l " +
+					"where l.localidad in (";
+			
+			for (int j = 0; j < paquete.getLocalidades().size(); j++) {
+				
+				sql += "?,";
+			}
+			sql = sql.substring(0,sql.length()-1);
+		
+			sql += ")";
+			
+			stmt = this.conn.prepareStatement(sql);	
+			
+			stmt.setInt(1, paquete.getId());
+			
+			for (int j = 2; j <= (paquete.getLocalidades().size() + 1); j++) {
+				
+				stmt.setString(j, paquete.getLocalidades().get(j-2));
+			}
+			
+			stmt.execute();
+			
+			stmt = this.conn.prepareStatement("delete from PasajerosPaquetes where paquete_id = ? ");
+			
+			stmt.setInt(1,paquete.getId()); 
+			
+			stmt.execute();
+
+			sql = "insert into PasajerosPaquetes(paquete_id, pasajero_id) " +
+			"select ? , p.id from Pasajeros p " +
+			"where p.dni in (";
+
+			for (int j = 0; j < paquete.getPasajeros().size(); j++) {
+
+				sql += "?,";
+			}
+
+			sql = sql.substring(0,sql.length()-1);
+		
+			sql += ")";
+			
+			stmt = this.conn.prepareStatement(sql);	
+			
+			stmt.setInt(1, paquete.getId());
+			
+			for (int j = 2; j <= (paquete.getPasajeros().size()+1); j++) {
+				
+				stmt.setInt(j, paquete.getPasajeros().get(j-2).getDni());
+			}
+			
+			stmt.execute();
+
+			persistenciaOk = true;
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return persistenciaOk;
 	}
 }

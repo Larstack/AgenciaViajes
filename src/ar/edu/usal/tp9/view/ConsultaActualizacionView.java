@@ -32,7 +32,7 @@ import ar.edu.usal.tp9.utils.GuiUtilities;
 
 public class ConsultaActualizacionView {
 	
-	private JFrame ventana = new JFrame("Consulta y actualizacion");
+	private JFrame ventana = new JFrame("Modificacion y Consulta");
 	
 	private JLabel lblLocalidades = new JLabel("Seleccionar localidad: ");
 	private JComboBox cmbLocalidades;
@@ -263,7 +263,7 @@ public class ConsultaActualizacionView {
 	public void mostrarMensajeDialog(String mensajeBody, String titulo) {
 		
 		JOptionPane.showMessageDialog(null, mensajeBody, titulo, JOptionPane.INFORMATION_MESSAGE);
-//		this.cerrar();
+		this.cerrar();
 	}
 	
 	public JComboBox getCmbPasajeros() {
@@ -377,6 +377,10 @@ public class ConsultaActualizacionView {
 		if(this.cmbHoras.getSelectedIndex() <= 0){
 
 			errores.add("hora");
+		}
+		if(this.getGrpSeguro().getSelection() == null){
+			
+			errores.add("seguro");
 		}
 		try{
 
@@ -557,5 +561,21 @@ public class ConsultaActualizacionView {
 		this.btnAceptar.setText("Aceptar");
 		GuiUtilities.setearComandoBoton(btnAceptar, "Aceptar", this.consultaActualizacionController);
 
+	}
+
+	public DefaultListModel getListModelPasajeros() {
+		return listModelPasajeros;
+	}
+
+	public void setListModelPasajeros(DefaultListModel listModelPasajeros) {
+		this.listModelPasajeros = listModelPasajeros;
+	}
+
+	public JList getListaPasajerosOriginal() {
+		return listaPasajerosOriginal;
+	}
+
+	public void setListaPasajerosOriginal(JList listaPasajerosOriginal) {
+		this.listaPasajerosOriginal = listaPasajerosOriginal;
 	}
 }

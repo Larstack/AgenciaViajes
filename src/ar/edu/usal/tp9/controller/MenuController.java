@@ -21,10 +21,10 @@ public class MenuController implements ActionListener {
 		if ("Ingreso".equals(e.getActionCommand())) {
 			IngresoController ingresoController = new IngresoController();
 			IngresoView ingresoView = new IngresoView(ingresoController);
-		} else if ("Consulta y Actualizacion".equals(e.getActionCommand())) { 
+		} else if ("Modificacion y Consulta".equals(e.getActionCommand())) { 
 			ConsultaActualizacionController consultaActualizacionController = new ConsultaActualizacionController();
 			ConsultaActualizacionView consultaActualizacionView = new ConsultaActualizacionView(consultaActualizacionController);
-		} else if ("Consulta Masiva".equals(e.getActionCommand())) {
+		} else if ("Consulta y Actualizacion Masiva".equals(e.getActionCommand())) {
 			ConsultaMasivaController consultaMasivaController = new ConsultaMasivaController();
 			ConsultaMasivaView consultaMasivaView = new ConsultaMasivaView(consultaMasivaController);
 		} else if ("Acerca de".equals(e.getActionCommand())) {

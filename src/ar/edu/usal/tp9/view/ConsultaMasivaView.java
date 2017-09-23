@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.JTextComponent;
 
 import ar.edu.usal.tp9.controller.ConsultaMasivaController;
 import ar.edu.usal.tp9.utils.Constants;
@@ -19,7 +19,7 @@ import ar.edu.usal.tp9.utils.GuiUtilities;
 
 public class ConsultaMasivaView {
 
-	private JFrame ventana = new JFrame("Consulta masiva");
+	private JFrame ventana = new JFrame("Consulta y Actualizacion Masiva");
 
 	private JLabel lblPasajero = new JLabel("Pasajero: ");
 	private JTextField txtPasajero = new JTextField(Constants.TEXTO_ANCHO);
@@ -56,8 +56,21 @@ public class ConsultaMasivaView {
 		this.consultaMasivaController = consultaMasivaController;
 
 		this.tableModel = (DefaultTableModel)this.getTablaResultado().getModel();
-		this.addColumnasTabla(tableModel);
 
+		this.addColumnasTabla(tableModel);
+		
+		this.getTablaResultado().getColumnModel().getColumn(1).setPreferredWidth(400);
+		this.getTablaResultado().getColumnModel().getColumn(2).setPreferredWidth(400);
+		this.getTablaResultado().getColumnModel().getColumn(3).setPreferredWidth(150);
+		this.getTablaResultado().getColumnModel().getColumn(4).setPreferredWidth(150);
+		this.getTablaResultado().getColumnModel().getColumn(5).setPreferredWidth(150);
+		this.getTablaResultado().getColumnModel().getColumn(6).setPreferredWidth(150);
+		this.getTablaResultado().getColumnModel().getColumn(7).setPreferredWidth(150);
+		this.getTablaResultado().getColumnModel().getColumn(8).setPreferredWidth(150);
+		this.getTablaResultado().getColumnModel().getColumn(9).setPreferredWidth(150);
+		this.getTablaResultado().getColumnModel().getColumn(10).setPreferredWidth(150);
+		this.getTablaResultado().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		
 		GuiUtilities.aplicarFormatoVentana(ventana);
 
 		GuiUtilities.aplicarFormatoTextField(ventana, txtPasajero);
@@ -137,5 +150,21 @@ public class ConsultaMasivaView {
 
 		this.contadorRegBusqueda.setText(cantidadRegistros);
 		this.contadorRegTotal.setText(cantidadRegistrosTotales);
+	}
+
+	public void mostrarMessageDialog(String error, String titulo) {
+		
+		JOptionPane.showMessageDialog(null, error, titulo, 
+				JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public void mostrarMensajeDialog(String mensajeBody, String titulo) {
+		
+		JOptionPane.showMessageDialog(null, mensajeBody, titulo, JOptionPane.INFORMATION_MESSAGE);
+		this.cerrar();	
+	}
+	
+	public void cerrar() {
+		ventana.dispose();
 	}
 }

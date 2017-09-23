@@ -542,7 +542,7 @@ public class Validador {
 		int horaTmp = fechaHora.get(Calendar.HOUR_OF_DAY);
 		int minutos = fechaHora.get(Calendar.MINUTE);
 
-		return horaTmp + ":" + minutos;
+		return Validador.fillString(String.valueOf(horaTmp), 2, "0", true)+ ":" + Validador.fillString(String.valueOf(minutos), 2, "0", true);
 	}
 	
 	public static String ListToString(ArrayList<String> listaString){

@@ -32,8 +32,8 @@ public class MenuView extends JFrame {
 		operacionesMenu.setMnemonic('O');
 
 		JMenuItem ingresoItem = GuiUtilities.setearDatosJMenuItem("Ingreso", menuController, operacionesMenu);		
-		JMenuItem consyActItem = GuiUtilities.setearDatosJMenuItem("Consulta y Actualizacion", menuController, operacionesMenu);
-		JMenuItem consMasivaItem = GuiUtilities.setearDatosJMenuItem("Consulta Masiva", menuController, operacionesMenu);
+		JMenuItem consyActItem = GuiUtilities.setearDatosJMenuItem("Modificacion y Consulta", menuController, operacionesMenu);
+		JMenuItem consMasivaItem = GuiUtilities.setearDatosJMenuItem("Consulta y Actualizacion Masiva", menuController, operacionesMenu);
 		
 		JMenuBar barra = new JMenuBar();
 		setJMenuBar(barra);

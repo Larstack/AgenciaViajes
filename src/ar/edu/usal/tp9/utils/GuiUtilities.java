@@ -149,6 +149,4 @@ public class GuiUtilities {
 			boton.addActionListener(listener);	
 		}
 	}
-	
-
 }
