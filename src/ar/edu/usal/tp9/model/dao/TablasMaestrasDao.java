@@ -6,7 +6,9 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
+import ar.edu.usal.tp9.model.dto.Paquetes;
 import ar.edu.usal.tp9.utils.DbConnection;
 
 public class TablasMaestrasDao {
@@ -108,5 +110,64 @@ public class TablasMaestrasDao {
 
 	public HashMap<String, Double> getLocalidadesImportesMap() {
 		return localidadesImportesMap;
+	}
+
+	public ArrayList<String> loadLocalidadesStringByPaquete(Paquetes paquete) {
+
+		HashMap<String,Double> localidadesImportesMapTmp = this.loadLocalidadesByPaquete(paquete);
+		ArrayList<String> localidades = new ArrayList<>();
+		
+		Iterator it = localidadesImportesMapTmp.keySet().iterator();
+		
+		while (it.hasNext()) {
+			
+			localidades.add((String) it.next());
+		}
+		
+		return localidades;
+	}
+	
+	public HashMap<String,Double> loadLocalidadesByPaquete(Paquetes paquete) {
+		
+		HashMap<String,Double> localidadesImportesMapTmp = new HashMap<String, Double>();
+		
+		try {
+			String sql = "SELECT localidad, importe FROM Localidades l " +
+					"inner join LocalidadesPaquetes lp on l.id = lp.localidad_id " +
+					"where lp.paquete_id =" + paquete.getId();
+
+			Statement stmt = this.conn.createStatement();		
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+
+				String localidad = rs.getString("localidad");
+				Double importe = rs.getDouble("importe");
+
+				localidadesImportesMapTmp.put(localidad, importe);
+			}
+		}catch (Exception e) {
+
+			System.out.println("Se ha verificado un error al cargar las localidades.");
+		}
+		
+		return localidadesImportesMapTmp;
+	}
+	
+	public String getLocalidadByNombre(String localidadBuscada) {
+		
+		Iterator it = this.localidadesImportesMap.keySet().iterator();
+		
+		while(it.hasNext()){
+			
+			String localidad = (String) it.next();
+			
+			if(localidadBuscada.trim().toUpperCase().equals(localidad.trim().toUpperCase())){
+				
+				return localidad;
+			}
+		}
+		
+		return null;
 	}
 }

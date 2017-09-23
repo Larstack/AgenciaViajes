@@ -131,8 +131,23 @@ public class GuiUtilities {
 	public static void setearComandoBoton(JButton boton, String nombreAccion, ActionListener listener) {
 
 		boton.setActionCommand(nombreAccion);
-		boton.addActionListener(listener);
+
+		/* Verificamos que el boton no tenga ya el listener pasado por parametro,
+		 * para evitar que se duplique y llame dos veces el mismo listener.
+		 */
+		boolean yaTieneEsteListener = false;
+		for (int i = 0; i < boton.getActionListeners().length; i++) {
+			
+			if(boton.getActionListeners()[i] == listener){
+				
+				yaTieneEsteListener = true;
+			}
+		}
 		
+		if(!yaTieneEsteListener){
+			
+			boton.addActionListener(listener);	
+		}
 	}
 	
 

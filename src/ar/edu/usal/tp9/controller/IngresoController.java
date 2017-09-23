@@ -102,7 +102,7 @@ public class IngresoController implements ActionListener, ICalculoImporte {
 				ingresoView.getModeloLocalidades().remove(elementosSeleccionados[i]);
 		
 		} else if ("Si".equals(e.getActionCommand())) {
-						
+
 			if (ingresoView.getRdbSi().isSelected()) {
 				ingresoView.getLeyenda().setVisible(true);
 			} 

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 
+import ar.edu.usal.tp9.model.dto.Paquetes;
 import ar.edu.usal.tp9.model.dto.Pasajeros;
 import ar.edu.usal.tp9.utils.DbConnection;
 
@@ -119,5 +120,35 @@ public class PasajerosDao {
 		}
 		
 		return null;
+	}
+
+	public ArrayList<Pasajeros> loadPasajerosByPaquete(Paquetes paquete) {
+
+		ArrayList<Pasajeros> pasajerosPaquete = new ArrayList<>();
+		
+		try {
+
+			String sql = "SELECT DISTINCT dni FROM pasajeros pas " +
+					"inner join PasajerosPaquetes pp on pas.id = pp.pasajero_id " +
+					"inner join Paquetes p on pp.paquete_id = p.id " +
+					"where p.id =" + paquete.getId();
+
+			Statement stmt = this.conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while(rs.next()){
+
+				int dni = rs.getInt("dni");
+
+				
+				pasajerosPaquete.add(this.getPasajeroByDocumento(dni));
+			}
+						
+		}catch(Exception e){
+
+			System.out.println("Error al cargar los pasajeros del paquete.");
+		}
+		
+		return pasajerosPaquete;
 	}
 }

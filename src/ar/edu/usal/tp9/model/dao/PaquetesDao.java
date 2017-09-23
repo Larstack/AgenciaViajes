@@ -9,6 +9,8 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,169 +31,13 @@ import ar.edu.usal.tp9.utils.Validador;
 
 public class PaquetesDao {
 
-//	private ArrayList<Paquetes> paquetes;
 	private Connection conn;
 
 	public PaquetesDao(){
 
-//		this.paquetes = new ArrayList<Paquetes>();
-
 		DbConnection dbConn = DbConnection.getInstance();
 		this.conn = dbConn.getConnection();
 	}
-
-	//	private void loadPaquetes() {
-	//
-	//		File paquetesTxt = new File("./archivos/PAQUETES.txt");
-	//		Scanner paquetesScanner;
-	//
-	//		try {
-	//
-	//			try {
-	//				paquetesTxt.createNewFile();
-	//
-	//			} catch (IOException e) {
-	//
-	//				System.out.println("Se ha verificado un error al cargar el archivo de paquetes.");
-	//			}
-	//
-	//			paquetesScanner = new Scanner(paquetesTxt);
-	//
-	//			while(paquetesScanner.hasNextLine()){
-	//
-	//				Paquetes paquete;
-	//
-	//				String linea = paquetesScanner.nextLine();
-	//				String[] lineaArray = linea.split(";");
-	//
-	//				//id
-	//				int idPaquete = Integer.parseInt(lineaArray[0].trim());
-	//
-	//				//fecha
-	//				Calendar fechaHoraSalida = Validador.stringToCalendar(lineaArray[1].trim(), "dd/MM/yyyy");
-	//
-	//				//hora
-	//				String horaCombo = lineaArray[2].trim();
-	//				int hora = Integer.valueOf(horaCombo.substring(0, 2));
-	//				int minutos = Integer.valueOf(horaCombo.substring(2, 4)); //hhmm
-	//				Validador.setearHora(hora, minutos, fechaHoraSalida);
-	//
-	//				//importe
-	//				double importe = Double.parseDouble(lineaArray[3].trim());
-	//
-	//				//pasajeros
-	//				ArrayList<Pasajeros> pasajeros = this.loadPasajeros(idPaquete);
-	//
-	//				//abono transporte local
-	//				boolean quiereAbonoTransporteLocal = Boolean.parseBoolean(lineaArray[4].trim());
-	//
-	//				//visitas guiadas
-	//				boolean quiereVisitasGuiadas = Boolean.parseBoolean(lineaArray[5].trim());
-	//
-	//				//seguro
-	//				boolean tieneSeguro = Boolean.parseBoolean(lineaArray[6].trim());
-	//
-	//				//localidades
-	//				ArrayList<String> localidades = this.loadLocalidades(idPaquete);
-	//
-	//				//cantidad dias
-	//				int cantidadDias = Integer.valueOf(lineaArray[9].trim());
-	//
-	//				//hotel
-	//				Hoteles hotel = null;
-	//				boolean esPensionCompleta = false;
-	//				HotelesDao hotelesDao = HotelesDao.getInstance();
-	//				if(lineaArray[10] != null){
-	//
-	//					hotel = hotelesDao.getHotelByNombre(lineaArray[9].trim());
-	//
-	//					//pension completa
-	//					esPensionCompleta = Boolean.parseBoolean(lineaArray[11].trim());
-	//
-	//					paquete = new PaquetesConEstadias();
-	//					((PaquetesConEstadias)paquete).setHotel(hotel);
-	//					((PaquetesConEstadias)paquete).setEsPensionCompleta(esPensionCompleta);
-	//
-	//				}else{
-	//
-	//					paquete = new Paquetes();
-	//				}
-	//
-	//				paquete.setQuiereAbonoTransporteLocal(quiereAbonoTransporteLocal);
-	//				paquete.setQuiereVisitasGuiadas(quiereVisitasGuiadas);
-	//				paquete.setTieneSeguro(tieneSeguro);	
-	//				paquete.setFechaHoraSalida(fechaHoraSalida);				
-	//				paquete.setImporte(importe);
-	//				paquete.setLocalidades(localidades);				
-	//				paquete.setPasajeros(pasajeros);
-	//				paquete.setCantidadDias(cantidadDias);
-	//
-	//				this.paquetes.add(paquete);
-	//			}
-	//
-	//			paquetesScanner.close();
-	//
-	//		}catch(InputMismatchException e){
-	//
-	//			System.out.println("Se ha encontrado un tipo de dato insesperado.");
-	//
-	//		}catch (FileNotFoundException e) {
-	//
-	//			System.out.println("No se ha encontrado el archivo.");
-	//		}
-	//	}
-
-//	private ArrayList<Pasajeros> loadPasajeros(int idPaquete) {
-//
-//		File pasajerosTxt = new File("./archivos/PAQUETES_PASAJEROS.txt");
-//		Scanner pasajerosScanner;
-//		PasajerosDao pasajerosDao = PasajerosDao.getInstance();
-//
-//		ArrayList<Pasajeros> pasajerosPaqueteList = new ArrayList<>();
-//
-//		try {
-//
-//			try {
-//				pasajerosTxt.createNewFile();
-//
-//			} catch (IOException e) {
-//
-//				System.out.println("Se ha verificado un error al cargar el archivo de pasajeros.");
-//			}
-//
-//			pasajerosScanner = new Scanner(pasajerosTxt);
-//
-//			while(pasajerosScanner.hasNextLine()){
-//
-//				String lineaPaquetePasajeros = pasajerosScanner.nextLine().trim();
-//				String[] arrayPaquetePasajeros = lineaPaquetePasajeros.split(";");
-//
-//				if(Integer.parseInt(arrayPaquetePasajeros[0].trim()) == idPaquete){
-//
-//					for (int i = 1; i < arrayPaquetePasajeros.length; i++) {
-//
-//						int dni = Integer.parseInt(arrayPaquetePasajeros[i].trim());
-//
-//						pasajerosPaqueteList.add(pasajerosDao.getPasajeroByDocumento(dni));
-//					}
-//
-//					break;
-//				}
-//			}
-//
-//			pasajerosScanner.close();
-//
-//		}catch(InputMismatchException e){
-//
-//			System.out.println("Se ha encontrado un tipo de dato insesperado.");
-//
-//		}catch (FileNotFoundException e) {
-//
-//			System.out.println("No se ha encontrado el archivo.");
-//		}
-//
-//		return pasajerosPaqueteList;
-//	}
 
 	private ArrayList<String> loadLocalidades(int idPaquete) {
 
@@ -573,10 +419,6 @@ public class PaquetesDao {
 		return null;
 	}
 
-//	public ArrayList<Paquetes> getPaquetes() {
-//		return paquetes;
-//	}
-
 	public Paquetes getPaqueteByPasajeroLocalidad(Pasajeros pasajero,
 			String localidadString) throws PaqueteNoEncontradoException {
 
@@ -645,8 +487,45 @@ public class PaquetesDao {
 
 	public ArrayList<Paquetes> getPaqueteByPasajero(Pasajeros pasajero) {
 
-		ArrayList<Paquetes> paquetesArray = new ArrayList<Paquetes>();
+		return loadPaquetes(pasajero);		
+	}
 
+	public ArrayList<Paquetes> loadTodosLosPaquetes() {
+		
+		return this.loadPaquetes(null);
+	}
+	
+	public int getCantidadTotalPaquetes() {
+		
+		int cantidad = 0;
+		
+		try{
+
+			String sql = "select count(paq.id) cantidad from Paquetes paq ";
+
+			Statement stmt = this.conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while(rs.next()){
+				
+				cantidad = rs.getInt("cantidad");
+			}
+			
+		}catch(Exception e){
+
+			e.printStackTrace();
+		}
+
+		return cantidad;
+	}
+
+	
+	private ArrayList<Paquetes> loadPaquetes(Pasajeros pasajero) {
+		
+		ArrayList<Paquetes> paquetesArray = new ArrayList<Paquetes>();
+		PasajerosDao pasajerosDao = PasajerosDao.getInstance();
+		TablasMaestrasDao tablasMaestrasDao = TablasMaestrasDao.getInstance();
+		
 		try{
 
 			String sql = "select distinct" +
@@ -660,12 +539,17 @@ public class PaquetesDao {
 					"	paq.quiere_abono_transporte_local quiere_abono_transporte_local, " +
 					"	paq.hotel_id hotel_id, " +
 					"	paq.es_pension_completa es_pension_completa " +
-					"from Paquetes paq " +
+					"from Paquetes paq ";
+
 //					"	inner join LocalidadesPaquetes lp on paq.id = lp.paquete_id " +
-					"		inner join PasajerosPaquetes pp on paq.id = pp.paquete_id " +
-					"			inner join Pasajeros pas on pp.pasajero_id = pas.id " +
-//					"				inner join Localidades l on lp.localidad_id = l.id " +
+//					"		inner join Localidades l on lp.localidad_id = l.id " +
+				
+			if(pasajero != null){
+
+				sql += " inner join PasajerosPaquetes pp on paq.id = pp.paquete_id " +
+					" inner join Pasajeros pas on pp.pasajero_id = pas.id " +
 					"where pas.dni = '" + String.valueOf(pasajero.getDni()) + "' ";
+			}
 
 			Statement stmt = this.conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
@@ -699,8 +583,12 @@ public class PaquetesDao {
 				paquete.setQuiereAbonoTransporteLocal(rs.getBoolean("quiere_abono_transporte_local"));
 
 				FacturasDao facturasDao = new FacturasDao();
-				facturasDao.loadFacturaById(rs.getInt(rs.getInt("factura_id")), paquete);
+				facturasDao.loadFacturaById(rs.getInt("factura_id"), paquete);
 
+				paquete.setPasajeros(pasajerosDao.loadPasajerosByPaquete(paquete));
+				
+				paquete.setLocalidades(tablasMaestrasDao.loadLocalidadesStringByPaquete(paquete));
+				
 				paquetesArray.add(paquete);
 			}
 		}catch(Exception e){

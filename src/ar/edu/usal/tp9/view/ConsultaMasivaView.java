@@ -26,6 +26,8 @@ public class ConsultaMasivaView {
 
 	private JButton btnConsultar =  new JButton("Consultar");
 
+	private JButton btnActualizar =  new JButton("Actualizar");
+
 	private JScrollPane scrollPane;
 
 	private JTable tablaResultado = new JTable();
@@ -39,7 +41,14 @@ public class ConsultaMasivaView {
 	private ConsultaMasivaController consultaMasivaController;
 
 	private JTextArea[] componentesTextosArray = {contadorRegBusqueda, contadorRegTotal};
-	private DefaultTableModel tableModel = new DefaultTableModel();
+	
+	private DefaultTableModel tableModel = new DefaultTableModel(){
+        @Override
+        public boolean isCellEditable(int row, int col)
+        {
+            return false;
+        }
+    };
 
 	public ConsultaMasivaView(ConsultaMasivaController consultaMasivaController) {
 
@@ -56,11 +65,12 @@ public class ConsultaMasivaView {
 		GuiUtilities.aplicarFormatoComponentes(ventana, componentesTextosArray);
 
 		GuiUtilities.setearComandoBoton(btnConsultar, "Consultar", consultaMasivaController);
+		GuiUtilities.setearComandoBoton(btnActualizar, "Actualizar", consultaMasivaController);
 
 		scrollPane = new JScrollPane(tablaResultado);
 
 		Component[] componentesArray = {lblPasajero, txtPasajero, btnConsultar, scrollPane, lblContRegBusqueda, 
-				contadorRegBusqueda, lblContRegTotal, contadorRegTotal};
+				contadorRegBusqueda, lblContRegTotal, contadorRegTotal, btnActualizar};
 
 		GuiUtilities.agregarComponentesVentana(ventana, componentesArray);
 
@@ -72,6 +82,7 @@ public class ConsultaMasivaView {
 
 		tableModel.setColumnIdentifiers(
 				new String[]{
+						"Id",
 						"Pasajero",
 						"Localidad/es",
 						"Fecha/Hora Salida",
@@ -113,8 +124,14 @@ public class ConsultaMasivaView {
 	public void mostrarRegistros(ArrayList<String[]> registros,
 			String cantidadRegistros, String cantidadRegistrosTotales) {
 
+		for (int i = 0; i < this.tableModel.getRowCount(); i++) {
+			
+			this.tableModel.removeRow(i);	
+		}
+		
 		for (int i = 0; i < registros.size(); i++) {
 
+			this.tableModel.isCellEditable(i, 0);
 			this.tableModel.addRow(registros.get(i));
 		}
 
